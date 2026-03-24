@@ -4,7 +4,7 @@ A fully self-contained browser gaming portal with 8 playable classic games. Zero
 
 ## Live Demo
 
-🌐 **[Play now →](https://your-portal.azurestaticapps.net)** *(replace with your Azure Static Web Apps URL)*
+🌐 **[Play now →](https://orange-river-04650e300.6.azurestaticapps.net)**
 
 ## Games
 
