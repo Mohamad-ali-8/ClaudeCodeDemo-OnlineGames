@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Offline Game Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1 class="site-title">🕹️ Offline Game Portal</h1>
+  <p class="site-subtitle">12 classic games &nbsp;·&nbsp; No internet required</p>
+</header>
+
+<main>
+  <div class="game-grid">
+
+    <!-- Chess -->
+    <a class="game-card" href="games/chess/index.html" data-status="ready">
+      <div class="card-icon">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#1a1a2e"/>
+          <!-- Chess board 4x4 pattern -->
+          <rect x="20" y="20" width="20" height="20" fill="#534AB7"/>
+          <rect x="40" y="20" width="20" height="20" fill="#2a2a4a"/>
+          <rect x="60" y="20" width="20" height="20" fill="#534AB7"/>
+          <rect x="80" y="20" width="20" height="20" fill="#2a2a4a"/>
+          <rect x="20" y="40" width="20" height="20" fill="#2a2a4a"/>
+          <rect x="40" y="40" width="20" height="20" fill="#534AB7"/>
+          <rect x="60" y="40" width="20" height="20" fill="#2a2a4a"/>
+          <rect x="80" y="40" width="20" height="20" fill="#534AB7"/>
+          <rect x="20" y="60" width="20" height="20" fill="#534AB7"/>
+          <rect x="40" y="60" width="20" height="20" fill="#2a2a4a"/>
+          <rect x="60" y="60" width="20" height="20" fill="#534AB7"/>
+          <rect x="80" y="60" width="20" height="20" fill="#2a2a4a"/>
+          <rect x="20" y="80" width="20" height="20" fill="#2a2a4a"/>
+          <rect x="40" y="80" width="20" height="20" fill="#534AB7"/>
+          <rect x="60" y="80" width="20" height="20" fill="#2a2a4a"/>
+          <rect x="80" y="80" width="20" height="20" fill="#534AB7"/>
+          <!-- King piece -->
+          <text x="60" y="68" font-size="32" text-anchor="middle" fill="white">♔</text>
+        </svg>
+      </div>
+      <h2 class="card-title">Chess</h2>
+      <p class="card-desc">Classic strategy, no clock</p>
+    </a>
+
+    <!-- Snake -->
+    <a class="game-card" href="games/snake/index.html" data-status="ready">
+      <div class="card-icon">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#0d2b1a"/>
+          <!-- Snake body segments -->
+          <rect x="20" y="55" width="18" height="18" rx="4" fill="#1D9E75"/>
+          <rect x="40" y="55" width="18" height="18" rx="4" fill="#1D9E75"/>
+          <rect x="60" y="55" width="18" height="18" rx="4" fill="#1D9E75"/>
+          <rect x="60" y="35" width="18" height="18" rx="4" fill="#1D9E75"/>
+          <rect x="80" y="35" width="18" height="18" rx="4" fill="#24bf8e"/>
+          <!-- Eyes on head -->
+          <circle cx="86" cy="41" r="2.5" fill="white"/>
+          <circle cx="93" cy="41" r="2.5" fill="white"/>
+          <circle cx="87" cy="41" r="1.2" fill="#0d2b1a"/>
+          <circle cx="94" cy="41" r="1.2" fill="#0d2b1a"/>
+          <!-- Tail tip -->
+          <rect x="20" y="75" width="12" height="12" rx="4" fill="#1D9E75" opacity="0.6"/>
+          <!-- Food -->
+          <circle cx="90" cy="80" r="9" fill="#e74c3c"/>
+          <line x1="90" y1="71" x2="90" y2="67" stroke="#27ae60" stroke-width="2"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Snake</h2>
+      <p class="card-desc">Grow longer, don't bite yourself</p>
+    </a>
+
+    <!-- Tetris -->
+    <a class="game-card" href="games/tetris/index.html" data-status="ready">
+      <div class="card-icon">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#0a0a1a"/>
+          <!-- I piece (cyan) -->
+          <rect x="18" y="22" width="18" height="18" rx="2" fill="#00f0f0"/>
+          <rect x="38" y="22" width="18" height="18" rx="2" fill="#00f0f0"/>
+          <rect x="58" y="22" width="18" height="18" rx="2" fill="#00f0f0"/>
+          <rect x="78" y="22" width="18" height="18" rx="2" fill="#00f0f0"/>
+          <!-- L piece (orange) -->
+          <rect x="18" y="44" width="18" height="18" rx="2" fill="#f0a000"/>
+          <rect x="18" y="64" width="18" height="18" rx="2" fill="#f0a000"/>
+          <rect x="18" y="84" width="18" height="18" rx="2" fill="#f0a000"/>
+          <rect x="38" y="84" width="18" height="18" rx="2" fill="#f0a000"/>
+          <!-- T piece (purple) -->
+          <rect x="58" y="44" width="18" height="18" rx="2" fill="#a000f0"/>
+          <rect x="78" y="44" width="18" height="18" rx="2" fill="#a000f0"/>
+          <rect x="98" y="44" width="18" height="18" rx="2" fill="#a000f0"/>
+          <rect x="78" y="64" width="18" height="18" rx="2" fill="#a000f0"/>
+          <!-- S piece (green) -->
+          <rect x="58" y="84" width="18" height="18" rx="2" fill="#00f000"/>
+          <rect x="78" y="84" width="18" height="18" rx="2" fill="#00f000"/>
+          <rect x="78" y="64" width="18" height="18" rx="2" fill="#00f000" opacity="0.3"/>
+          <rect x="98" y="64" width="18" height="18" rx="2" fill="#00f000"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Tetris</h2>
+      <p class="card-desc">Stack blocks, clear lines</p>
+    </a>
+
+    <!-- Minesweeper -->
+    <a class="game-card" href="games/minesweeper/index.html" data-status="ready">
+      <div class="card-icon">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#1a1a1a"/>
+          <!-- Grid cells -->
+          <rect x="15" y="15" width="26" height="26" rx="3" fill="#3a3a3a"/>
+          <rect x="47" y="15" width="26" height="26" rx="3" fill="#3a3a3a"/>
+          <rect x="79" y="15" width="26" height="26" rx="3" fill="#3a3a3a"/>
+          <rect x="15" y="47" width="26" height="26" rx="3" fill="#2a2a2a"/>
+          <rect x="47" y="47" width="26" height="26" rx="3" fill="#3a3a3a"/>
+          <rect x="79" y="47" width="26" height="26" rx="3" fill="#2a2a2a"/>
+          <rect x="15" y="79" width="26" height="26" rx="3" fill="#3a3a3a"/>
+          <rect x="47" y="79" width="26" height="26" rx="3" fill="#2a2a2a"/>
+          <rect x="79" y="79" width="26" height="26" rx="3" fill="#3a3a3a"/>
+          <!-- Mine -->
+          <text x="60" y="36" font-size="18" text-anchor="middle" fill="#e8e6f0">💣</text>
+          <!-- Numbers -->
+          <text x="28" y="67" font-size="16" text-anchor="middle" fill="#4444ff" font-weight="bold">2</text>
+          <text x="92" y="67" font-size="16" text-anchor="middle" fill="#ff4444" font-weight="bold">3</text>
+          <text x="28" y="99" font-size="16" text-anchor="middle" fill="#44aa44" font-weight="bold">1</text>
+          <!-- Flag -->
+          <text x="92" y="99" font-size="14" text-anchor="middle" fill="#e8e6f0">🚩</text>
+        </svg>
+      </div>
+      <h2 class="card-title">Minesweeper</h2>
+      <p class="card-desc">Find all mines without exploding</p>
+    </a>
+
+    <!-- 2048 -->
+    <a class="game-card" href="games/2048/index.html" data-status="ready">
+      <div class="card-icon">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#1a0f05"/>
+          <rect x="14" y="14" width="42" height="42" rx="6" fill="#3d2b0f"/>
+          <rect x="64" y="14" width="42" height="42" rx="6" fill="#5a3a10"/>
+          <rect x="14" y="64" width="42" height="42" rx="6" fill="#7a4f12"/>
+          <rect x="64" y="64" width="42" height="42" rx="6" fill="#BA7517"/>
+          <text x="35" y="43" font-size="16" text-anchor="middle" fill="#BA7517" font-weight="bold" font-family="monospace">2</text>
+          <text x="85" y="43" font-size="16" text-anchor="middle" fill="#d4960e" font-weight="bold" font-family="monospace">4</text>
+          <text x="35" y="93" font-size="16" text-anchor="middle" fill="#f0d090" font-weight="bold" font-family="monospace">8</text>
+          <text x="85" y="96" font-size="11" text-anchor="middle" fill="white" font-weight="bold" font-family="monospace">2048</text>
+        </svg>
+      </div>
+      <h2 class="card-title">2048</h2>
+      <p class="card-desc">Merge tiles to reach 2048</p>
+    </a>
+
+    <!-- Sudoku -->
+    <a class="game-card" href="games/sudoku/index.html" data-status="ready">
+      <div class="card-icon">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#05051a"/>
+          <!-- Sudoku grid lines (9x9 condensed) -->
+          <rect x="12" y="12" width="96" height="96" rx="2" fill="none" stroke="#7F77DD" stroke-width="2"/>
+          <!-- Thin internal lines -->
+          <line x1="12" y1="44" x2="108" y2="44" stroke="#7F77DD" stroke-width="0.5" opacity="0.4"/>
+          <line x1="12" y1="76" x2="108" y2="76" stroke="#7F77DD" stroke-width="0.5" opacity="0.4"/>
+          <line x1="44" y1="12" x2="44" y2="108" stroke="#7F77DD" stroke-width="0.5" opacity="0.4"/>
+          <line x1="76" y1="12" x2="76" y2="108" stroke="#7F77DD" stroke-width="0.5" opacity="0.4"/>
+          <!-- Thick box lines -->
+          <line x1="12" y1="44" x2="108" y2="44" stroke="#7F77DD" stroke-width="2" opacity="0.8"/>
+          <line x1="12" y1="76" x2="108" y2="76" stroke="#7F77DD" stroke-width="2" opacity="0.8"/>
+          <line x1="44" y1="12" x2="44" y2="108" stroke="#7F77DD" stroke-width="2" opacity="0.8"/>
+          <line x1="76" y1="12" x2="76" y2="108" stroke="#7F77DD" stroke-width="2" opacity="0.8"/>
+          <!-- Sample numbers -->
+          <text x="28" y="34" font-size="14" text-anchor="middle" fill="#7F77DD" font-weight="bold">5</text>
+          <text x="60" y="34" font-size="14" text-anchor="middle" fill="#a09ae0">3</text>
+          <text x="92" y="34" font-size="14" text-anchor="middle" fill="#7F77DD" font-weight="bold">7</text>
+          <text x="28" y="66" font-size="14" text-anchor="middle" fill="#a09ae0">6</text>
+          <text x="60" y="66" font-size="14" text-anchor="middle" fill="#7F77DD" font-weight="bold">9</text>
+          <text x="92" y="66" font-size="14" text-anchor="middle" fill="#a09ae0">1</text>
+          <text x="28" y="98" font-size="14" text-anchor="middle" fill="#7F77DD" font-weight="bold">8</text>
+          <text x="60" y="98" font-size="14" text-anchor="middle" fill="#a09ae0">4</text>
+          <text x="92" y="98" font-size="14" text-anchor="middle" fill="#7F77DD" font-weight="bold">2</text>
+        </svg>
+      </div>
+      <h2 class="card-title">Sudoku</h2>
+      <p class="card-desc">Fill the grid with logic</p>
+    </a>
+
+    <!-- Pong -->
+    <a class="game-card" href="games/pong/index.html" data-status="ready">
+      <div class="card-icon">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#000000"/>
+          <!-- Center line (dashed) -->
+          <line x1="60" y1="10" x2="60" y2="20" stroke="#D3D1C7" stroke-width="3" stroke-linecap="round"/>
+          <line x1="60" y1="28" x2="60" y2="38" stroke="#D3D1C7" stroke-width="3" stroke-linecap="round"/>
+          <line x1="60" y1="46" x2="60" y2="56" stroke="#D3D1C7" stroke-width="3" stroke-linecap="round"/>
+          <line x1="60" y1="64" x2="60" y2="74" stroke="#D3D1C7" stroke-width="3" stroke-linecap="round"/>
+          <line x1="60" y1="82" x2="60" y2="92" stroke="#D3D1C7" stroke-width="3" stroke-linecap="round"/>
+          <line x1="60" y1="100" x2="60" y2="110" stroke="#D3D1C7" stroke-width="3" stroke-linecap="round"/>
+          <!-- Left paddle -->
+          <rect x="12" y="38" width="10" height="44" rx="4" fill="#D3D1C7"/>
+          <!-- Right paddle -->
+          <rect x="98" y="38" width="10" height="44" rx="4" fill="#D3D1C7"/>
+          <!-- Ball -->
+          <circle cx="75" cy="48" r="7" fill="#D3D1C7"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Pong</h2>
+      <p class="card-desc">Classic paddle battle</p>
+    </a>
+
+    <!-- Memory Match -->
+    <a class="game-card" href="games/memory-match/index.html" data-status="ready">
+      <div class="card-icon">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#0a1a1a"/>
+          <!-- Card 1 (face up - star) -->
+          <rect x="10" y="10" width="45" height="45" rx="6" fill="#1a3a3a"/>
+          <text x="32" y="41" font-size="26" text-anchor="middle" fill="#5DCAA5">⭐</text>
+          <!-- Card 2 (face up - star) -->
+          <rect x="65" y="10" width="45" height="45" rx="6" fill="#1a3a3a"/>
+          <text x="87" y="41" font-size="26" text-anchor="middle" fill="#5DCAA5">⭐</text>
+          <!-- Card 3 (face down) -->
+          <rect x="10" y="65" width="45" height="45" rx="6" fill="#5DCAA5"/>
+          <line x1="10" y1="65" x2="55" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+          <line x1="55" y1="65" x2="10" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+          <circle cx="32" cy="87" r="8" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <!-- Card 4 (face down) -->
+          <rect x="65" y="65" width="45" height="45" rx="6" fill="#5DCAA5"/>
+          <line x1="65" y1="65" x2="110" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+          <line x1="110" y1="65" x2="65" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+          <circle cx="87" cy="87" r="8" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Memory Match</h2>
+      <p class="card-desc">Flip and match emoji pairs</p>
+    </a>
+
+    <!-- Breakout (Coming Soon) -->
+    <a class="game-card" href="#" data-status="coming-soon">
+      <div class="card-icon coming-soon-overlay">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#1a0505"/>
+          <!-- Brick rows -->
+          <rect x="10" y="15" width="28" height="14" rx="2" fill="#D85A30"/>
+          <rect x="42" y="15" width="28" height="14" rx="2" fill="#e06030"/>
+          <rect x="74" y="15" width="28" height="14" rx="2" fill="#D85A30"/>
+          <rect x="10" y="33" width="28" height="14" rx="2" fill="#c04020"/>
+          <rect x="42" y="33" width="28" height="14" rx="2" fill="#D85A30"/>
+          <rect x="74" y="33" width="28" height="14" rx="2" fill="#c04020"/>
+          <rect x="10" y="51" width="28" height="14" rx="2" fill="#D85A30" opacity="0.6"/>
+          <rect x="42" y="51" width="28" height="14" rx="2" fill="#c04020" opacity="0.6"/>
+          <!-- Ball -->
+          <circle cx="65" cy="78" r="7" fill="#f0d090"/>
+          <!-- Paddle -->
+          <rect x="30" y="100" width="50" height="10" rx="4" fill="#888780"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Breakout</h2>
+      <p class="card-desc">Smash bricks with a bouncing ball</p>
+      <span class="badge-soon">Coming Soon</span>
+    </a>
+
+    <!-- Pac-Man (Coming Soon) -->
+    <a class="game-card" href="#" data-status="coming-soon">
+      <div class="card-icon coming-soon-overlay">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#0a0a00"/>
+          <!-- Maze walls -->
+          <rect x="10" y="10" width="100" height="8" rx="2" fill="#2266CC"/>
+          <rect x="10" y="102" width="100" height="8" rx="2" fill="#2266CC"/>
+          <rect x="10" y="10" width="8" height="100" rx="2" fill="#2266CC"/>
+          <rect x="102" y="10" width="8" height="100" rx="2" fill="#2266CC"/>
+          <!-- Pellets -->
+          <circle cx="35" cy="60" r="3" fill="#EF9F27"/>
+          <circle cx="50" cy="60" r="3" fill="#EF9F27"/>
+          <!-- Pac-Man -->
+          <path d="M 85 60 A 22 22 0 1 1 85 59.9 L 85 60 Z" fill="#EF9F27"/>
+          <path d="M 85 60 L 107 47 A 22 22 0 0 1 107 73 Z" fill="#0a0a00"/>
+          <!-- Ghost -->
+          <ellipse cx="35" cy="35" rx="14" ry="14" fill="#ff8080"/>
+          <rect x="21" y="35" width="28" height="14" fill="#ff8080"/>
+          <polygon points="21,49 27,43 33,49 39,43 45,49 49,43 49,49" fill="#ff8080"/>
+          <circle cx="30" cy="33" r="4" fill="white"/>
+          <circle cx="40" cy="33" r="4" fill="white"/>
+          <circle cx="31" cy="34" r="2" fill="#2266CC"/>
+          <circle cx="41" cy="34" r="2" fill="#2266CC"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Pac-Man</h2>
+      <p class="card-desc">Eat pellets, dodge ghosts</p>
+      <span class="badge-soon">Coming Soon</span>
+    </a>
+
+    <!-- Connect Four (Coming Soon) -->
+    <a class="game-card" href="#" data-status="coming-soon">
+      <div class="card-icon coming-soon-overlay">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#050a1a"/>
+          <!-- Board -->
+          <rect x="8" y="30" width="104" height="82" rx="8" fill="#185FA5"/>
+          <!-- Holes / Discs -->
+          <circle cx="28" cy="50" r="12" fill="#0a1a3a"/>
+          <circle cx="60" cy="50" r="12" fill="#0a1a3a"/>
+          <circle cx="92" cy="50" r="12" fill="#0a1a3a"/>
+          <circle cx="28" cy="78" r="12" fill="#f0c000"/>
+          <circle cx="60" cy="78" r="12" fill="#f0c000"/>
+          <circle cx="92" cy="78" r="12" fill="#e03030"/>
+          <circle cx="28" cy="106" r="12" fill="#e03030"/>
+          <circle cx="60" cy="106" r="12" fill="#f0c000"/>
+          <circle cx="92" cy="106" r="12" fill="#e03030"/>
+          <!-- Winning disc indicator -->
+          <circle cx="60" cy="78" r="5" fill="white" opacity="0.6"/>
+          <!-- Arrow pointing down -->
+          <polygon points="60,5 52,18 68,18" fill="#EF9F27"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Connect Four</h2>
+      <p class="card-desc">Drop discs, connect four in a row</p>
+      <span class="badge-soon">Coming Soon</span>
+    </a>
+
+    <!-- Wordle (Coming Soon) -->
+    <a class="game-card" href="#" data-status="coming-soon">
+      <div class="card-icon coming-soon-overlay">
+        <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="12" fill="#0a0a0a"/>
+          <!-- Row 1 - all gray (wrong) -->
+          <rect x="10" y="10" width="20" height="20" rx="3" fill="#3a3a3c"/>
+          <rect x="34" y="10" width="20" height="20" rx="3" fill="#3a3a3c"/>
+          <rect x="58" y="10" width="20" height="20" rx="3" fill="#3a3a3c"/>
+          <rect x="82" y="10" width="20" height="20" rx="3" fill="#3a3a3c"/>
+          <rect x="90" y="10" width="20" height="20" rx="3" fill="#3a3a3c"/>
+          <!-- Row 2 - yellow, green, gray mix -->
+          <rect x="10" y="34" width="20" height="20" rx="3" fill="#b59f3b"/>
+          <rect x="34" y="34" width="20" height="20" rx="3" fill="#639922"/>
+          <rect x="58" y="34" width="20" height="20" rx="3" fill="#b59f3b"/>
+          <rect x="82" y="34" width="20" height="20" rx="3" fill="#3a3a3c"/>
+          <rect x="90" y="34" width="20" height="20" rx="3" fill="#639922"/>
+          <!-- Row 3 - mostly green -->
+          <rect x="10" y="58" width="20" height="20" rx="3" fill="#639922"/>
+          <rect x="34" y="58" width="20" height="20" rx="3" fill="#639922"/>
+          <rect x="58" y="58" width="20" height="20" rx="3" fill="#639922"/>
+          <rect x="82" y="58" width="20" height="20" rx="3" fill="#639922"/>
+          <rect x="90" y="58" width="20" height="20" rx="3" fill="#639922"/>
+          <!-- Letters -->
+          <text x="20" y="25" font-size="11" text-anchor="middle" fill="white" font-weight="bold">W</text>
+          <text x="44" y="25" font-size="11" text-anchor="middle" fill="white" font-weight="bold">O</text>
+          <text x="68" y="25" font-size="11" text-anchor="middle" fill="white" font-weight="bold">R</text>
+          <text x="92" y="25" font-size="11" text-anchor="middle" fill="white" font-weight="bold">D</text>
+          <text x="100" y="25" font-size="11" text-anchor="middle" fill="white" font-weight="bold">S</text>
+          <!-- Empty rows -->
+          <rect x="10" y="82" width="20" height="20" rx="3" fill="none" stroke="#3a3a3c" stroke-width="1.5"/>
+          <rect x="34" y="82" width="20" height="20" rx="3" fill="none" stroke="#3a3a3c" stroke-width="1.5"/>
+          <rect x="58" y="82" width="20" height="20" rx="3" fill="none" stroke="#3a3a3c" stroke-width="1.5"/>
+          <rect x="82" y="82" width="20" height="20" rx="3" fill="none" stroke="#3a3a3c" stroke-width="1.5"/>
+          <rect x="90" y="82" width="20" height="20" rx="3" fill="none" stroke="#3a3a3c" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <h2 class="card-title">Wordle Clone</h2>
+      <p class="card-desc">Guess the 5-letter word</p>
+      <span class="badge-soon">Coming Soon</span>
+    </a>
+
+  </div><!-- /.game-grid -->
+</main>
+
+<!-- Coming Soon Modal -->
+<div id="cs-modal">
+  <div class="modal-box">
+    <span class="modal-emoji">🚧</span>
+    <h2 class="modal-title">Coming Soon!</h2>
+    <p class="modal-text">This game is still under construction. Check back soon!</p>
+    <button id="cs-close">Got it</button>
+  </div>
+</div>
+
+<footer>
+  Built with pure HTML, CSS &amp; JavaScript &nbsp;·&nbsp; No frameworks, no build tools, no internet required
+</footer>
+
+<script>
+  'use strict';
+  document.querySelectorAll('[data-status="coming-soon"]').forEach(card => {
+    card.addEventListener('click', e => {
+      e.preventDefault();
+      const modal = document.getElementById('cs-modal');
+      modal.classList.add('open');
+    });
+  });
+  document.getElementById('cs-close').addEventListener('click', () => {
+    document.getElementById('cs-modal').classList.remove('open');
+  });
+  document.getElementById('cs-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) {
+      e.currentTarget.classList.remove('open');
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.getElementById('cs-modal').classList.remove('open');
+    }
+  });
+</script>
+
+</body>
+</html>

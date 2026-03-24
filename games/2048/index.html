@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2048 — Offline Game Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a0a1a;color:#e8e6f0;font-family:'Orbitron',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:16px}
+    a.back{color:#1D9E75;text-decoration:none;font-size:.8rem;margin-bottom:12px;align-self:flex-start;padding:6px 12px;border:1px solid #1D9E75;border-radius:6px;transition:background .15s}
+    a.back:hover{background:#1D9E75;color:#0a0a1a}
+    h1{font-size:1.6rem;letter-spacing:.1em;margin-bottom:4px}
+    .sub{font-size:.75rem;color:#888;margin-bottom:16px}
+    #scores{display:flex;gap:12px;margin-bottom:16px}
+    .score-box{background:#12122a;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 20px;text-align:center;min-width:90px}
+    .score-box label{font-size:.6rem;letter-spacing:.1em;color:#888;display:block;margin-bottom:2px}
+    .score-box span{font-size:1.3rem;color:#EF9F27;font-weight:700}
+    #grid-container{position:relative;width:min(380px,90vw);height:min(380px,90vw);background:#3d3327;border-radius:12px;padding:8px}
+    #grid-bg{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:8px;width:100%;height:100%}
+    .cell-bg{background:#cdc1b4;border-radius:6px}
+    #tiles{position:absolute;inset:8px;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:8px}
+    .tile{border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .1s;animation:appear .12s ease-out}
+    @keyframes appear{from{transform:scale(0)}to{transform:scale(1)}}
+    .tile-merge{animation:merge .15s ease-out}
+    @keyframes merge{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+    #btns{display:flex;gap:10px;margin-top:14px}
+    #btn-new{padding:10px 24px;background:#BA7517;color:white;border:none;border-radius:8px;font-family:'Orbitron',sans-serif;font-size:.8rem;cursor:pointer;transition:background .15s}
+    #btn-new:hover{background:#d4870f}
+    #instructions{font-size:.72rem;color:#666;margin-top:10px;text-align:center}
+    /* Overlay */
+    .overlay{display:none;position:absolute;inset:0;border-radius:12px;background:rgba(238,228,218,.73);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+    .overlay.show{display:flex}
+    .ov-title{font-size:1.8rem;color:#776e65;font-weight:700}
+    .ov-score{font-size:1.2rem;color:#BA7517}
+    .ov-btn{padding:8px 20px;background:#8f7a66;color:white;border:none;border-radius:7px;font-family:'Orbitron',sans-serif;font-size:.75rem;cursor:pointer;margin-top:4px}
+    .ov-btn:hover{background:#a0897a}
+    .ov-continue{background:transparent;color:#776e65;border:1px solid #776e65;margin-left:8px}
+  </style>
+</head>
+<body>
+<a class="back" href="../../index.html">← Back to Menu</a>
+<h1>2048</h1>
+<p class="sub">Merge tiles — reach the 2048 tile!</p>
+<div id="scores">
+  <div class="score-box"><label>SCORE</label><span id="score">0</span></div>
+  <div class="score-box"><label>BEST</label><span id="best">0</span></div>
+</div>
+<div id="grid-container">
+  <div id="grid-bg"></div>
+  <div id="tiles"></div>
+  <div class="overlay" id="ov-win">
+    <div class="ov-title">🎉 You Win!</div>
+    <div class="ov-score">Score: <span id="win-score"></span></div>
+    <div>
+      <button class="ov-btn" id="btn-continue">Keep Going</button>
+      <button class="ov-btn ov-continue" id="btn-new-win">New Game</button>
+    </div>
+  </div>
+  <div class="overlay" id="ov-lose">
+    <div class="ov-title">Game Over</div>
+    <div class="ov-score">Score: <span id="lose-score"></span></div>
+    <button class="ov-btn" id="btn-new-lose">Try Again</button>
+  </div>
+</div>
+<div id="btns"><button id="btn-new">New Game</button></div>
+<p id="instructions">Use arrow keys or swipe to move tiles</p>
+
+<script>
+'use strict';
+const N=4;
+const HS='2048_best';
+const COLORS={
+  2:{bg:'#eee4da',fg:'#776e65'},4:{bg:'#ede0c8',fg:'#776e65'},8:{bg:'#f2b179',fg:'#f9f6f2'},
+  16:{bg:'#f59563',fg:'#f9f6f2'},32:{bg:'#f67c5f',fg:'#f9f6f2'},64:{bg:'#f65e3b',fg:'#f9f6f2'},
+  128:{bg:'#edcf72',fg:'#f9f6f2'},256:{bg:'#edcc61',fg:'#f9f6f2'},512:{bg:'#edc850',fg:'#f9f6f2'},
+  1024:{bg:'#edc53f',fg:'#f9f6f2'},2048:{bg:'#edc22e',fg:'#f9f6f2'}
+};
+
+let grid,score,won;
+function getBest(){return parseInt(localStorage.getItem(HS)||'0');}
+function setBest(s){if(s>getBest())localStorage.setItem(HS,s);}
+document.getElementById('best').textContent=getBest();
+
+// Build background grid
+const bg=document.getElementById('grid-bg');
+for(let i=0;i<16;i++){const d=document.createElement('div');d.className='cell-bg';bg.appendChild(d);}
+
+function newGame(){
+  grid=Array.from({length:N},()=>Array(N).fill(0));
+  score=0;won=false;
+  document.getElementById('score').textContent='0';
+  document.getElementById('ov-win').classList.remove('show');
+  document.getElementById('ov-lose').classList.remove('show');
+  addRandom();addRandom();
+  render();
+}
+
+function addRandom(){
+  const empty=[];
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++) if(!grid[r][c]) empty.push([r,c]);
+  if(!empty.length) return;
+  const [r,c]=empty[Math.floor(Math.random()*empty.length)];
+  grid[r][c]=Math.random()<0.9?2:4;
+}
+
+function fontSize(v){
+  if(v<100) return '2rem';
+  if(v<1000) return '1.5rem';
+  if(v<10000) return '1.1rem';
+  return '.85rem';
+}
+
+function render(){
+  const tiles=document.getElementById('tiles');
+  tiles.innerHTML='';
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+    const v=grid[r][c];
+    if(!v) continue;
+    const el=document.createElement('div');
+    el.className='tile';
+    el.style.gridRow=r+1;el.style.gridColumn=c+1;
+    const clr=COLORS[v]||{bg:'#3c3a32',fg:'#f9f6f2'};
+    el.style.background=clr.bg;el.style.color=clr.fg;
+    el.style.fontSize=fontSize(v);
+    el.textContent=v;
+    tiles.appendChild(el);
+  }
+  document.getElementById('score').textContent=score;
+  document.getElementById('best').textContent=getBest();
+}
+
+function slide(row){
+  let arr=row.filter(v=>v);
+  let merged=false;
+  for(let i=0;i<arr.length-1;i++){
+    if(arr[i]===arr[i+1]){arr[i]*=2;score+=arr[i];arr.splice(i+1,1);i++;merged=true;}
+  }
+  while(arr.length<N) arr.push(0);
+  return arr;
+}
+
+function move(dir){
+  let moved=false;
+  const prev=JSON.stringify(grid);
+  if(dir==='left'||dir==='right'){
+    for(let r=0;r<N;r++){
+      let row=dir==='right'?[...grid[r]].reverse():grid[r];
+      const slid=slide(row);
+      const final=dir==='right'?slid.reverse():slid;
+      grid[r]=final;
+    }
+  } else {
+    for(let c=0;c<N;c++){
+      let col=Array.from({length:N},(_,r)=>grid[r][c]);
+      if(dir==='down') col.reverse();
+      const slid=slide(col);
+      if(dir==='down') slid.reverse();
+      for(let r=0;r<N;r++) grid[r][c]=slid[r];
+    }
+  }
+  if(JSON.stringify(grid)!==prev){
+    moved=true;
+    setBest(score);
+    addRandom();
+    render();
+    checkState();
+  }
+  return moved;
+}
+
+function checkState(){
+  // Win
+  if(!won && grid.flat().includes(2048)){
+    won=true;
+    document.getElementById('win-score').textContent=score;
+    document.getElementById('ov-win').classList.add('show');
+    return;
+  }
+  // Lose
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){
+    if(!grid[r][c]) return;
+    if(r<N-1&&grid[r][c]===grid[r+1][c]) return;
+    if(c<N-1&&grid[r][c]===grid[r][c+1]) return;
+  }
+  document.getElementById('lose-score').textContent=score;
+  document.getElementById('ov-lose').classList.add('show');
+}
+
+document.addEventListener('keydown',e=>{
+  const map={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'};
+  if(map[e.key]){e.preventDefault();move(map[e.key]);}
+});
+
+// Swipe
+let tx,ty;
+document.getElementById('grid-container').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.getElementById('grid-container').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)){move(dx>0?'right':'left');}else{move(dy>0?'down':'up');}
+},{passive:true});
+
+document.getElementById('btn-new').onclick=newGame;
+document.getElementById('btn-new-win').onclick=newGame;
+document.getElementById('btn-new-lose').onclick=newGame;
+document.getElementById('btn-continue').onclick=()=>document.getElementById('ov-win').classList.remove('show');
+
+newGame();
+</script>
+</body>
+</html>

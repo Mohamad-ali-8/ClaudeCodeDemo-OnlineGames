@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sudoku — Offline Game Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a0a1a;color:#e8e6f0;font-family:'Orbitron',sans-serif;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:16px}
+    a.back{color:#1D9E75;text-decoration:none;font-size:.8rem;margin-bottom:12px;align-self:flex-start;padding:6px 12px;border:1px solid #1D9E75;border-radius:6px;transition:background .15s}
+    a.back:hover{background:#1D9E75;color:#0a0a1a}
+    h1{font-size:1.4rem;letter-spacing:.1em;margin-bottom:10px}
+    #diff-row{display:flex;gap:8px;margin-bottom:10px}
+    .dbtn{padding:6px 14px;border:1px solid #7F77DD;border-radius:7px;background:transparent;color:#e8e6f0;font-family:'Orbitron',sans-serif;font-size:.7rem;cursor:pointer;transition:background .15s}
+    .dbtn.active,.dbtn:hover{background:#7F77DD;color:#0a0a1a}
+    #info-row{display:flex;gap:16px;align-items:center;margin-bottom:10px;font-size:.78rem}
+    #timer-disp{color:#7F77DD}
+    #board{display:grid;grid-template-columns:repeat(9,1fr);width:min(400px,95vw);height:min(400px,95vw);border:3px solid #7F77DD;border-radius:4px;overflow:hidden}
+    .sq{display:flex;align-items:center;justify-content:center;font-size:min(22px,4vw);cursor:pointer;transition:background .15s;position:relative;border:0.5px solid rgba(127,119,221,.25)}
+    .sq:nth-child(9n+4),.sq:nth-child(9n+7){border-left:2px solid #7F77DD}
+    .sq:nth-child(n+19):nth-child(-n+27),.sq:nth-child(n+46):nth-child(-n+54){border-bottom:2px solid #7F77DD}
+    /* Row 3 and 6 dividers */
+    .sq.row3bot{border-bottom:2px solid #7F77DD}
+    .sq.row6bot{border-bottom:2px solid #7F77DD}
+    .sq.given{color:#e8e6f0;font-weight:700}
+    .sq.player{color:#7F77DD}
+    .sq.selected{background:rgba(127,119,221,.35)!important}
+    .sq.highlight{background:rgba(127,119,221,.1)}
+    .sq.error{background:rgba(231,76,60,.25)!important;color:#e74c3c!important}
+    .sq:hover:not(.given){background:rgba(127,119,221,.15)}
+    #numpad{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+    .npad{width:44px;height:44px;background:#12122a;border:1px solid #7F77DD;border-radius:8px;color:#7F77DD;font-family:'Orbitron',sans-serif;font-size:1rem;cursor:pointer;transition:background .15s}
+    .npad:hover{background:#7F77DD;color:#0a0a1a}
+    .npad.clear{border-color:#e74c3c;color:#e74c3c}
+    .npad.clear:hover{background:#e74c3c;color:white}
+    #action-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+    .abtn{padding:8px 16px;border:1px solid #534AB7;border-radius:7px;background:transparent;color:#e8e6f0;font-family:'Orbitron',sans-serif;font-size:.7rem;cursor:pointer;transition:background .15s}
+    .abtn:hover{background:#534AB7;color:white}
+    #msg{margin-top:8px;font-size:.85rem;color:#EF9F27;min-height:1.3em;text-align:center}
+  </style>
+</head>
+<body>
+<a class="back" href="../../index.html">← Back to Menu</a>
+<h1>Sudoku</h1>
+<div id="diff-row">
+  <button class="dbtn active" data-d="easy">Easy</button>
+  <button class="dbtn" data-d="medium">Medium</button>
+  <button class="dbtn" data-d="hard">Hard</button>
+</div>
+<div id="info-row">
+  <span>Time: <span id="timer-disp">0:00</span></span>
+</div>
+<div id="board"></div>
+<div id="numpad"></div>
+<div id="action-row">
+  <button class="abtn" id="btn-validate">✓ Validate</button>
+  <button class="abtn" id="btn-reveal">👁 Reveal Solution</button>
+  <button class="abtn" id="btn-new">New Puzzle</button>
+</div>
+<div id="msg"></div>
+
+<script>
+'use strict';
+const PUZZLES = {
+  easy:[
+    {p:'530070000600195000098000060800060003400803001700020006060000280000419005000080079',s:'534678912672195348198342567859761423426853791713924856961537284287419635345286179'},
+    {p:'200080300060070084030500209000105408000000000402706000301007040720040060004010003',s:'214986375569273184738541269697125438851364792423798651316857942975432861142619503'},
+    {p:'000000907000420180000705026100904000050000040000507009920108000034059000507000000',s:'614832957793426185258795326176984532532671948489357219925168473834259761561743298'},
+    {p:'030050040008010500460000012070502080000603000040109030510000093007040600020060010',s:'932751648748216593465398712179542386823967154641189237514823769357491628296675411'},
+    {p:'020000000000600003074080000000003002080400070600500000000060400500200800003000060',s:'126437958895621437374985612567893142983412675612578394738164529541279863249358761'}
+  ],
+  medium:[
+    {p:'000000907000420180000705026100904000050000040000507009920108000034059000507000000',s:'614832957793426185258795326176984532532671948489357219925168473834259761561743298'},
+    {p:'000030086000020040009006100030000000000509000000000020007800600050060007840070000',s:'174539286658127349329846157432768915761594832985213726217485693593261487846972531'},
+    {p:'600000803040700000000000000000504070300200000106000000020000050000080600000010000',s:'692541873843726195517398642238954761354267918176823549721639254965482317489175326'},
+    {p:'000000000000003085001020000000507000004000100090000000500000073002010000000040009',s:'987654321246173985531928476123567894864392157795481263519836742372219648648745219'},
+    {p:'300000000970010000600583000200000900000020060030000700000600400800000097000000800',s:'381479256972016548645583179216754983754928361839261745527693412893142697163857824'}
+  ],
+  hard:[
+    {p:'000000907000420180000705026100904000050000040000507009920108000034059000507000000',s:'614832957793426185258795326176984532532671948489357219925168473834259761561743298'},
+    {p:'800000000003600000070090200060005030004000100030700060000060007500000400000800090',s:'812753649943682175675491283261945837594318726387276561128564397756139482439827915'},
+    {p:'000000000000003085001020000000507000004000100090000000500000073002010000000040009',s:'987654321246173985531928476123567894864392157795481263519836742372219648648745219'},
+    {p:'000600000700003400000091080000600000050000072600000000030900000000008006000014500',s:'251687394798523461436791285924638751853174962617259843375946128142865976569412537'},
+    {p:'000060400008000090070050001500100000000000000000004002900020780100000300003040000',s:'351962478628417593479853261547138926836295147912674832964521789185749326293486015'}
+  ]
+};
+
+let diff='easy',puzzle,solution,userGrid,given,selected,timerInt,elapsed,validated;
+function pad2(n){return String(n).padStart(2,'0');}
+function fmtTime(s){return Math.floor(s/60)+':'+pad2(s%60);}
+
+function loadPuzzle(d){
+  diff=d;
+  clearInterval(timerInt);elapsed=0;validated=false;
+  document.getElementById('timer-disp').textContent='0:00';
+  document.getElementById('msg').textContent='';
+  const arr=PUZZLES[d];
+  const p=arr[Math.floor(Math.random()*arr.length)];
+  puzzle=p.p.split('').map(Number);
+  solution=p.s.split('').map(Number);
+  given=puzzle.map(v=>v!==0);
+  userGrid=puzzle.map(v=>v===0?0:v);
+  selected=null;
+  timerInt=setInterval(()=>{elapsed++;document.getElementById('timer-disp').textContent=fmtTime(elapsed);},1000);
+  renderBoard();
+}
+
+function renderBoard(){
+  const b=document.getElementById('board');
+  b.innerHTML='';
+  for(let i=0;i<81;i++){
+    const r=Math.floor(i/9),c=i%9;
+    const sq=document.createElement('div');
+    sq.className='sq'+(given[i]?' given':' player');
+    if(r===2) sq.classList.add('row3bot');
+    if(r===5) sq.classList.add('row6bot');
+    sq.dataset.i=i;
+    const v=userGrid[i];
+    sq.textContent=v||'';
+    if(i===selected) sq.classList.add('selected');
+    else if(selected!==null){
+      const sr=Math.floor(selected/9),sc=selected%9;
+      const sbox=Math.floor(sr/3)*3+Math.floor(sc/3);
+      const tbox=Math.floor(r/3)*3+Math.floor(c/3);
+      if(r===sr||c===sc||tbox===sbox) sq.classList.add('highlight');
+    }
+    if(validated&&!given[i]&&v!==0&&v!==solution[i]) sq.classList.add('error');
+    sq.addEventListener('click',()=>{selected=i;renderBoard();});
+    b.appendChild(sq);
+  }
+}
+
+function inputNum(n){
+  if(selected===null||given[selected]) return;
+  validated=false;
+  userGrid[selected]=n;
+  // Auto-advance
+  renderBoard();
+  checkWin();
+}
+
+function checkWin(){
+  if(userGrid.every((v,i)=>v===solution[i])){
+    clearInterval(timerInt);
+    document.getElementById('msg').textContent='🎉 Solved! Time: '+fmtTime(elapsed);
+  }
+}
+
+// Build numpad
+const np=document.getElementById('numpad');
+for(let n=1;n<=9;n++){
+  const btn=document.createElement('button');
+  btn.className='npad';btn.textContent=n;
+  btn.addEventListener('click',()=>inputNum(n));
+  np.appendChild(btn);
+}
+const clr=document.createElement('button');
+clr.className='npad clear';clr.textContent='✕';
+clr.addEventListener('click',()=>inputNum(0));
+np.appendChild(clr);
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key>='1'&&e.key<='9') inputNum(parseInt(e.key));
+  else if(e.key==='Backspace'||e.key==='Delete'||e.key==='0') inputNum(0);
+  else if(selected!==null){
+    const r=Math.floor(selected/9),c=selected%9;
+    if(e.key==='ArrowRight'&&c<8){selected++;renderBoard();}
+    else if(e.key==='ArrowLeft'&&c>0){selected--;renderBoard();}
+    else if(e.key==='ArrowDown'&&r<8){selected+=9;renderBoard();}
+    else if(e.key==='ArrowUp'&&r>0){selected-=9;renderBoard();}
+  }
+});
+
+document.getElementById('btn-validate').onclick=()=>{
+  validated=true;
+  let errors=0;
+  userGrid.forEach((v,i)=>{if(!given[i]&&v!==0&&v!==solution[i])errors++;});
+  if(errors===0) document.getElementById('msg').textContent='✓ No errors found!';
+  else document.getElementById('msg').textContent='✗ '+errors+' error(s) highlighted in red.';
+  renderBoard();
+};
+
+document.getElementById('btn-reveal').onclick=()=>{
+  if(confirm('Reveal the full solution?')){
+    clearInterval(timerInt);
+    userGrid=[...solution];validated=false;
+    renderBoard();
+    document.getElementById('msg').textContent='Solution revealed.';
+  }
+};
+
+document.getElementById('btn-new').onclick=()=>loadPuzzle(diff);
+document.querySelectorAll('.dbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    loadPuzzle(btn.dataset.d);
+  });
+});
+
+loadPuzzle('easy');
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(az --version)",
+      "Bash(gh --version)",
+      "Bash(git --version)",
+      "Bash(gh auth:*)",
+      "Bash(az account:*)"
+    ]
+  }
+}

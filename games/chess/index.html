@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chess — Offline Game Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a0a1a;color:#e8e6f0;font-family:'Orbitron',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
+    a.back{color:#1D9E75;text-decoration:none;font-size:0.8rem;letter-spacing:.05em;margin-bottom:16px;align-self:flex-start;padding:6px 12px;border:1px solid #1D9E75;border-radius:6px;transition:background .15s}
+    a.back:hover{background:#1D9E75;color:#0a0a1a}
+    h1{font-size:1.4rem;margin-bottom:8px;letter-spacing:.1em;color:#e8e6f0}
+    #status{font-size:.85rem;color:#EF9F27;letter-spacing:.05em;margin-bottom:12px;min-height:1.2em;text-align:center}
+    #game-area{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+    #board-wrap{position:relative}
+    #board{display:grid;grid-template-columns:repeat(8,1fr);width:min(480px,90vmin);height:min(480px,90vmin);border:3px solid #534AB7;box-shadow:0 0 30px rgba(83,74,183,.4)}
+    .cell{display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;position:relative;transition:background .1s}
+    .cell.light{background:#eeeed2}
+    .cell.dark{background:#769656}
+    .cell.selected{background:#f6f669!important}
+    .cell.legal{background:rgba(0,0,0,.15)!important}
+    .cell.legal::after{content:'';position:absolute;width:30%;height:30%;background:rgba(0,0,0,.3);border-radius:50%;pointer-events:none}
+    .cell.legal-capture{outline:4px solid rgba(0,0,0,.4);outline-offset:-4px}
+    .cell.check{background:#ff6b6b!important}
+    .piece{font-size:min(52px,9vmin);line-height:1;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.5);filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+    .piece.white{color:#fff;text-shadow:0 0 4px rgba(0,0,0,.8)}
+    .piece.black{color:#1a1a1a;text-shadow:0 0 4px rgba(255,255,255,.3)}
+    #coords-file{display:flex;width:min(480px,90vmin)}
+    #coords-file span,.coords-rank span{font-size:.65rem;color:#888;text-align:center}
+    #coords-file span{flex:1}
+    .coords-rank{position:absolute;left:-18px;top:0;height:100%;display:flex;flex-direction:column}
+    .coords-rank span{flex:1;display:flex;align-items:center;font-size:.65rem;color:#888}
+    #side-panel{display:flex;flex-direction:column;gap:12px;width:200px;min-width:160px}
+    .panel-box{background:#12122a;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px}
+    .panel-box h3{font-size:.75rem;letter-spacing:.1em;color:#888;margin-bottom:8px;text-transform:uppercase}
+    #new-game{width:100%;padding:10px;background:#534AB7;color:white;border:none;border-radius:8px;font-family:'Orbitron',sans-serif;font-size:.8rem;cursor:pointer;letter-spacing:.05em;transition:background .15s}
+    #new-game:hover{background:#6a5fd4}
+    #captured-w,#captured-b{font-size:1.1rem;min-height:1.4em;word-break:break-all;line-height:1.4}
+    #move-list{font-size:.72rem;font-family:monospace;color:#a0a0c0;max-height:200px;overflow-y:auto;line-height:1.8}
+    /* Promotion Modal */
+    #promo-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center}
+    #promo-modal.open{display:flex}
+    #promo-box{background:#12122a;border:2px solid #534AB7;border-radius:16px;padding:24px;text-align:center}
+    #promo-box h3{margin-bottom:16px;color:#e8e6f0;font-size:.9rem;letter-spacing:.05em}
+    .promo-pieces{display:flex;gap:12px}
+    .promo-btn{font-size:2.8rem;background:#1a1a3a;border:2px solid transparent;border-radius:8px;width:60px;height:60px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
+    .promo-btn:hover{border-color:#EF9F27}
+    /* Game Over Modal */
+    #over-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center}
+    #over-modal.open{display:flex}
+    #over-box{background:#12122a;border:2px solid #1D9E75;border-radius:16px;padding:32px;text-align:center;max-width:320px}
+    #over-title{font-size:1.4rem;margin-bottom:8px;color:#1D9E75}
+    #over-msg{color:#888;margin-bottom:20px;font-family:sans-serif;font-size:.9rem}
+    #over-new{padding:10px 24px;background:#534AB7;color:white;border:none;border-radius:8px;font-family:'Orbitron',sans-serif;font-size:.85rem;cursor:pointer}
+    #over-new:hover{background:#6a5fd4}
+  </style>
+</head>
+<body>
+<a class="back" href="../../index.html">← Back to Menu</a>
+<h1>Chess</h1>
+<div id="status">White's turn</div>
+<div id="game-area">
+  <div id="board-wrap">
+    <div class="coords-rank" id="coords-rank"></div>
+    <div id="board"></div>
+    <div id="coords-file"></div>
+  </div>
+  <div id="side-panel">
+    <button id="new-game">New Game</button>
+    <div class="panel-box">
+      <h3>Captured by White</h3>
+      <div id="captured-w"></div>
+    </div>
+    <div class="panel-box">
+      <h3>Captured by Black</h3>
+      <div id="captured-b"></div>
+    </div>
+    <div class="panel-box">
+      <h3>Move History</h3>
+      <div id="move-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Promotion modal -->
+<div id="promo-modal">
+  <div id="promo-box">
+    <h3>Promote pawn to:</h3>
+    <div class="promo-pieces" id="promo-pieces"></div>
+  </div>
+</div>
+
+<!-- Game over modal -->
+<div id="over-modal">
+  <div id="over-box">
+    <div id="over-title"></div>
+    <div id="over-msg"></div>
+    <button id="over-new">Play Again</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+const PIECES = {
+  wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',
+  bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'
+};
+const INIT = [
+  'bR','bN','bB','bQ','bK','bB','bN','bR',
+  'bP','bP','bP','bP','bP','bP','bP','bP',
+  null,null,null,null,null,null,null,null,
+  null,null,null,null,null,null,null,null,
+  null,null,null,null,null,null,null,null,
+  null,null,null,null,null,null,null,null,
+  'wP','wP','wP','wP','wP','wP','wP','wP',
+  'wR','wN','wB','wQ','wK','wB','wN','wR'
+];
+
+let board, turn, selected, legalMoves, capturedW, capturedB, moveHistory;
+let enPassant, castlingRights, promoCallback;
+let moveCount = 0;
+
+function init() {
+  board = [...INIT];
+  turn = 'w';
+  selected = null;
+  legalMoves = [];
+  capturedW = [];
+  capturedB = [];
+  moveHistory = [];
+  enPassant = null;
+  castlingRights = {wK:true,wQ:true,bK:true,bQ:true};
+  moveCount = 0;
+  renderBoard();
+  updateStatus();
+  updateSidePanel();
+  document.getElementById('over-modal').classList.remove('open');
+}
+
+function col(i){return i%8}
+function row(i){return Math.floor(i/8)}
+function idx(r,c){return r*8+c}
+function color(p){return p?p[0]:null}
+function type(p){return p?p[1]:null}
+function opp(c){return c==='w'?'b':'w'}
+
+function renderBoard() {
+  const b = document.getElementById('board');
+  b.innerHTML = '';
+  const rankEl = document.getElementById('coords-rank');
+  rankEl.innerHTML = '';
+  const fileEl = document.getElementById('coords-file');
+  fileEl.innerHTML = '';
+  const files = 'abcdefgh';
+  for(let f=0;f<8;f++){const s=document.createElement('span');s.textContent=files[f];fileEl.appendChild(s);}
+  for(let r=0;r<8;r++){const s=document.createElement('span');s.textContent=8-r;rankEl.appendChild(s);}
+
+  for(let i=0;i<64;i++){
+    const r=row(i),c=col(i);
+    const cell=document.createElement('div');
+    cell.className='cell '+(((r+c)%2===0)?'light':'dark');
+    cell.dataset.idx=i;
+    if(board[i]){
+      const span=document.createElement('span');
+      span.className='piece '+(color(board[i])==='w'?'white':'black');
+      span.textContent=PIECES[board[i]];
+      cell.appendChild(span);
+    }
+    if(selected===i) cell.classList.add('selected');
+    if(legalMoves.includes(i)){
+      if(board[i] && color(board[i])!==turn) cell.classList.add('legal-capture');
+      else cell.classList.add('legal');
+    }
+    // check highlight
+    if(board[i]===turn+'K' && isInCheck(board,turn)) cell.classList.add('check');
+    cell.addEventListener('click',()=>cellClick(i));
+    b.appendChild(cell);
+  }
+}
+
+function cellClick(i) {
+  if(selected===null) {
+    if(board[i] && color(board[i])===turn) {
+      selected=i;
+      legalMoves=getLegalMoves(board,i,turn,enPassant,castlingRights);
+      renderBoard();
+    }
+  } else {
+    if(legalMoves.includes(i)) {
+      doMove(selected,i);
+    } else if(board[i] && color(board[i])===turn) {
+      selected=i;
+      legalMoves=getLegalMoves(board,i,turn,enPassant,castlingRights);
+      renderBoard();
+    } else {
+      selected=null;legalMoves=[];renderBoard();
+    }
+  }
+}
+
+function doMove(from,to,promoType) {
+  const nb=[...board];
+  const piece=nb[from];
+  const cap=nb[to];
+  const t=type(piece);
+  const newCastling={...castlingRights};
+  let newEP=null;
+  let notation=files()[col(from)]+(8-row(from));
+
+  // En passant capture
+  if(t==='P' && enPassant===to) {
+    const capRow=row(from);
+    nb[idx(capRow,col(to))]=null;
+  }
+
+  // Castling
+  if(t==='K') {
+    if(turn==='w'){newCastling.wK=false;newCastling.wQ=false;}
+    else{newCastling.bK=false;newCastling.bQ=false;}
+    if(col(to)-col(from)===2) { nb[idx(row(from),5)]=nb[idx(row(from),7)];nb[idx(row(from),7)]=null; }
+    if(col(from)-col(to)===2) { nb[idx(row(from),3)]=nb[idx(row(from),0)];nb[idx(row(from),0)]=null; }
+  }
+  if(t==='R') {
+    if(from===0) newCastling.bQ=false;
+    if(from===7) newCastling.bK=false;
+    if(from===56) newCastling.wQ=false;
+    if(from===63) newCastling.wK=false;
+  }
+
+  // Pawn double push
+  if(t==='P' && Math.abs(row(to)-row(from))===2) {
+    newEP=idx((row(from)+row(to))/2, col(from));
+  }
+
+  // Move piece
+  nb[to]=piece;
+  nb[from]=null;
+
+  // Promotion
+  if(t==='P' && (row(to)===0||row(to)===7)) {
+    if(promoType) {
+      nb[to]=turn+promoType;
+      executeMove(nb,from,to,cap,newEP,newCastling);
+    } else {
+      showPromoModal(nb,from,to,cap,newEP,newCastling);
+      return;
+    }
+    return;
+  }
+
+  executeMove(nb,from,to,cap,newEP,newCastling);
+}
+
+function executeMove(nb,from,to,cap,newEP,newCastling) {
+  const piece=nb[to];
+  if(cap) {
+    if(color(cap)==='b') capturedW.push(cap);
+    else capturedB.push(cap);
+  }
+  // record move
+  const files_='abcdefgh';
+  const notation=files_[col(to)]+(8-row(to));
+  moveCount++;
+  moveHistory.push((turn==='w'?Math.ceil(moveCount/2)+'. ':'')+notation);
+
+  board=nb;
+  enPassant=newEP;
+  castlingRights=newCastling;
+  turn=opp(turn);
+  selected=null;legalMoves=[];
+
+  // Check game state
+  const allMoves=getAllMoves(board,turn,enPassant,castlingRights);
+  if(allMoves.length===0) {
+    renderBoard();
+    if(isInCheck(board,turn)) showGameOver(opp(turn)+' wins by Checkmate!','Checkmate');
+    else showGameOver('Stalemate — It\'s a Draw!','Stalemate');
+    return;
+  }
+  if(isInCheck(board,turn)) updateStatus('Check! '+(turn==='w'?'White':'Black')+' is in check.');
+  else updateStatus((turn==='w'?'White':'Black')+'\'s turn');
+  renderBoard();
+  updateSidePanel();
+}
+
+function showPromoModal(nb,from,to,cap,newEP,newCastling) {
+  const modal=document.getElementById('promo-modal');
+  const container=document.getElementById('promo-pieces');
+  container.innerHTML='';
+  const types=turn==='w'?['Q','R','B','N']:['Q','R','B','N'];
+  const symbols={Q:turn==='w'?'♕':'♛',R:turn==='w'?'♖':'♜',B:turn==='w'?'♗':'♝',N:turn==='w'?'♘':'♞'};
+  types.forEach(t=>{
+    const btn=document.createElement('button');
+    btn.className='promo-btn';
+    btn.textContent=symbols[t];
+    btn.onclick=()=>{
+      modal.classList.remove('open');
+      nb[to]=turn+t;
+      executeMove(nb,from,to,cap,newEP,newCastling);
+    };
+    container.appendChild(btn);
+  });
+  modal.classList.add('open');
+}
+
+function showGameOver(msg,type) {
+  const modal=document.getElementById('over-modal');
+  document.getElementById('over-title').textContent=type;
+  document.getElementById('over-msg').textContent=msg;
+  modal.classList.add('open');
+}
+
+function updateStatus(msg) {
+  document.getElementById('status').textContent=msg||(turn==='w'?'White':'Black')+"'s turn";
+}
+
+function updateSidePanel() {
+  const sym=p=>PIECES[p];
+  document.getElementById('captured-w').textContent=capturedW.map(sym).join('');
+  document.getElementById('captured-b').textContent=capturedB.map(sym).join('');
+  const ml=document.getElementById('move-list');
+  const moves=[];
+  for(let i=0;i<moveHistory.length;i+=2){
+    moves.push((Math.floor(i/2)+1)+'. '+(moveHistory[i]||'')+' '+(moveHistory[i+1]||''));
+  }
+  ml.textContent=moves.join('\n');
+  ml.scrollTop=ml.scrollHeight;
+}
+
+function files(){return 'abcdefgh'}
+
+// ─── Move Generation ──────────────────────────────────────────────────────────
+function getPseudoMoves(b,i,ep,cr) {
+  const piece=b[i];
+  if(!piece) return [];
+  const t=type(piece),c=color(piece);
+  const moves=[];
+  const r=row(i),cl=col(i);
+  const add=(r2,c2)=>{if(r2>=0&&r2<8&&c2>=0&&c2<8){const j=idx(r2,c2);if(!b[j]||color(b[j])!==c)moves.push(j);}};
+  const slide=(dr,dc)=>{let rr=r+dr,cc=cl+dc;while(rr>=0&&rr<8&&cc>=0&&cc<8){const j=idx(rr,cc);if(!b[j]){moves.push(j);}else{if(color(b[j])!==c)moves.push(j);break;}rr+=dr;cc+=dc;}};
+
+  if(t==='P') {
+    const dir=c==='w'?-1:1;
+    const startRow=c==='w'?6:1;
+    // forward
+    if(r+dir>=0&&r+dir<8&&!b[idx(r+dir,cl)]) {
+      moves.push(idx(r+dir,cl));
+      if(r===startRow&&!b[idx(r+2*dir,cl)]) moves.push(idx(r+2*dir,cl));
+    }
+    // captures
+    [[r+dir,cl-1],[r+dir,cl+1]].forEach(([rr,cc])=>{
+      if(rr>=0&&rr<8&&cc>=0&&cc<8){
+        const j=idx(rr,cc);
+        if((b[j]&&color(b[j])!==c)||(ep===j)) moves.push(j);
+      }
+    });
+  } else if(t==='N') {
+    [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc])=>add(r+dr,cl+dc));
+  } else if(t==='B') {
+    [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc])=>slide(dr,dc));
+  } else if(t==='R') {
+    [[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>slide(dr,dc));
+  } else if(t==='Q') {
+    [[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]].forEach(([dr,dc])=>slide(dr,dc));
+  } else if(t==='K') {
+    [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,dc])=>add(r+dr,cl+dc));
+    // Castling
+    const baseRow=c==='w'?7:0;
+    if(r===baseRow&&cl===4) {
+      if((c==='w'?cr.wK:cr.bK)&&!b[idx(baseRow,5)]&&!b[idx(baseRow,6)]&&
+         !isSquareAttacked(b,idx(baseRow,4),opp(c))&&!isSquareAttacked(b,idx(baseRow,5),opp(c))&&!isSquareAttacked(b,idx(baseRow,6),opp(c)))
+        moves.push(idx(baseRow,6));
+      if((c==='w'?cr.wQ:cr.bQ)&&!b[idx(baseRow,3)]&&!b[idx(baseRow,2)]&&!b[idx(baseRow,1)]&&
+         !isSquareAttacked(b,idx(baseRow,4),opp(c))&&!isSquareAttacked(b,idx(baseRow,3),opp(c))&&!isSquareAttacked(b,idx(baseRow,2),opp(c)))
+        moves.push(idx(baseRow,2));
+    }
+  }
+  return moves;
+}
+
+function isSquareAttacked(b,sq,byColor) {
+  for(let i=0;i<64;i++) {
+    if(b[i]&&color(b[i])===byColor) {
+      const pm=getPseudoMoves(b,i,null,{wK:false,wQ:false,bK:false,bQ:false});
+      if(pm.includes(sq)) return true;
+    }
+  }
+  return false;
+}
+
+function isInCheck(b,c) {
+  const kingIdx=b.indexOf(c+'K');
+  if(kingIdx===-1) return false;
+  return isSquareAttacked(b,kingIdx,opp(c));
+}
+
+function getLegalMoves(b,i,c,ep,cr) {
+  const pseudo=getPseudoMoves(b,i,ep,cr);
+  return pseudo.filter(to=>{
+    const nb=[...b];
+    // en passant capture remove
+    if(type(b[i])==='P'&&ep===to) {
+      nb[idx(row(i),col(to))]=null;
+    }
+    nb[to]=nb[i];nb[i]=null;
+    return !isInCheck(nb,c);
+  });
+}
+
+function getAllMoves(b,c,ep,cr) {
+  const all=[];
+  for(let i=0;i<64;i++) {
+    if(b[i]&&color(b[i])===c) {
+      const moves=getLegalMoves(b,i,c,ep,cr);
+      moves.forEach(to=>all.push({from:i,to}));
+    }
+  }
+  return all;
+}
+
+document.getElementById('new-game').onclick=init;
+document.getElementById('over-new').onclick=init;
+init();
+</script>
+</body>
+</html>
